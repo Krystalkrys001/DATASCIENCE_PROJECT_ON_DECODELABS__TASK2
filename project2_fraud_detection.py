@@ -1,7 +1,7 @@
-# =========================================
+
 # PROJECT 2: Supervised Learning, Fraud Detection Pipeline
 # DecodeLabs Data Science Industrial Training, 2026 Batch
-# =========================================
+
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -11,9 +11,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 
-# =========================================
+
 # STEP 1: Load and inspect the data
-# =========================================
 df = pd.read_csv("creditcard.csv")
 print(df.shape)                     # (284807, 31)
 print(df.isnull().sum().sum())      # 0, no missing values in this dataset
@@ -21,18 +20,16 @@ print(df["Class"].value_counts())
 print(df["Class"].value_counts(normalize=True) * 100)
 # Fraud rate: 0.17%. This imbalance is the entire reason this project exists.
 
-# =========================================
+
 # STEP 2: Prove why "accuracy" is a trap on this data
-# =========================================
 lazy_predictions = [0] * len(df)
 lazy_accuracy = (lazy_predictions == df["Class"]).mean()
 print(f"A model that predicts 'legitimate' for everything: {lazy_accuracy*100:.2f}% accuracy")
 print("Fraud caught by that lazy model: 0 out of", df["Class"].sum())
 # 99.83% accuracy, 0 fraud caught. Accuracy alone is meaningless here.
 
-# =========================================
+
 # STEP 3: Train/test split (stratified, BEFORE any resampling)
-# =========================================
 X = df.drop(columns=["Class"])
 y = df["Class"]
 
@@ -41,11 +38,10 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 # stratify=y keeps the same 0.17% fraud ratio in both train and test
 
-# =========================================
+
 # STEP 4a: Logistic Regression pipeline
 # Scale FIRST, then SMOTE (SMOTE uses distance, unscaled "Amount"
 # would dominate the nearest-neighbor calculation otherwise)
-# =========================================
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)      # fit only on train
 X_test_scaled = scaler.transform(X_test)             # test only ever transformed, never fit
@@ -66,7 +62,7 @@ print("\n--- Logistic Regression: Classification Report ---")
 print(classification_report(y_test, y_pred_lr, digits=4))
 print("Logistic Regression ROC-AUC:", roc_auc_score(y_test, y_proba_lr))
 
-# =========================================
+
 # STEP 4b: Random Forest pipeline
 # No scaling needed, tree-based models split ordinally, immune to scale.
 # SMOTE applied directly to raw (unscaled) training data.
@@ -104,3 +100,6 @@ print("Random Forest ROC-AUC:", roc_auc_score(y_test, y_proba_rf))
 # In production, that difference is what determines whether a fraud team
 # trusts and acts on the model's alerts, or drowns in false positives
 # and starts ignoring them.
+
+
+link to my linkedin post : https://www.linkedin.com/posts/chukwuma-obinna-ulasi-082198413_decoodelabs-intern-chukwumaulasi-activity-7503099700259053569-pqZB?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAGk2S2IBonLi7enVgV_4EWmKqN3SMKtPPDg
