@@ -19,7 +19,7 @@ Split 80/20 using stratify=y, which preserves the 0.17% fraud ratio identically 
 
 SMOTE (Synthetic Minority Over-sampling Technique) generates synthetic fraud examples by interpolating between real fraud cases nearest neighbors, rather than simply duplicating them. Applied **only to the training set**, after the split, never before. Applying it before splitting would leak synthetic copies of test-set fraud into training, producing test results that look great but don't reflect real-world performance.
 
-**A second, less obvious leakage risk**: SMOTE's "nearest neighbor" calculation is distance-based. Amount ranges up to 25,691 in this dataset while the anonymized V1-V28 features mostly sit between -60 and 10. Without scaling first, Amount would dominate every distance calculation, meaning the synthetic fraud examples get built almost entirely on price similarity, not on the more informative but smaller-scale patterns in the other 28 features. For the Logistic Regression pipeline, features were scaled with `StandardScaler` **before** SMOTE was applied, for exactly this reason.
+**A second, less obvious leakage risk**: SMOTE's "nearest neighbor" calculation is distance-based. Amount ranges up to 25,691 in this dataset while the anonymized V1-V28 features mostly sit between -60 and 10. Without scaling first, Amount would dominate every distance calculation, meaning the synthetic fraud examples get built almost entirely on price similarity, not on the more informative but smaller-scale patterns in the other 28 features. For the Logistic Regression pipeline, features were scaled with StandardScaler **before** SMOTE was applied, for exactly this reason.
 
 ## 3. Two Models, Two Different Requirements
 
