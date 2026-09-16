@@ -13,13 +13,13 @@ A model that predicts "legitimate" for every single transaction, doing zero actu
 
 ## 1. Train/Test Split, Before Any Resampling
 
-Split 80/20 using `stratify=y`, which preserves the 0.17% fraud ratio identically in both the training set (0.1729%) and test set (0.1720%). This matters because a random split without stratification risks concentrating rare fraud cases unevenly across the two sets, distorting everything downstream.
+Split 80/20 using stratify=y, which preserves the 0.17% fraud ratio identically in both the training set (0.1729%) and test set (0.1720%). This matters because a random split without stratification risks concentrating rare fraud cases unevenly across the two sets, distorting everything downstream.
 
 ## 2. Handling Class Imbalance: SMOTE
 
-SMOTE (Synthetic Minority Over-sampling Technique) generates synthetic fraud examples by interpolating between real fraud cases' nearest neighbors, rather than simply duplicating them. Applied **only to the training set**, after the split, never before. Applying it before splitting would leak synthetic copies of test-set fraud into training, producing test results that look great but don't reflect real-world performance.
+SMOTE (Synthetic Minority Over-sampling Technique) generates synthetic fraud examples by interpolating between real fraud cases nearest neighbors, rather than simply duplicating them. Applied **only to the training set**, after the split, never before. Applying it before splitting would leak synthetic copies of test-set fraud into training, producing test results that look great but don't reflect real-world performance.
 
-**A second, less obvious leakage risk**: SMOTE's "nearest neighbor" calculation is distance-based. `Amount` ranges up to 25,691 in this dataset while the anonymized `V1`-`V28` features mostly sit between -60 and 10. Without scaling first, `Amount` would dominate every distance calculation, meaning the synthetic fraud examples get built almost entirely on price similarity, not on the more informative but smaller-scale patterns in the other 28 features. For the Logistic Regression pipeline, features were scaled with `StandardScaler` **before** SMOTE was applied, for exactly this reason.
+**A second, less obvious leakage risk**: SMOTE's "nearest neighbor" calculation is distance-based. Amount ranges up to 25,691 in this dataset while the anonymized V1-V28 features mostly sit between -60 and 10. Without scaling first, Amount would dominate every distance calculation, meaning the synthetic fraud examples get built almost entirely on price similarity, not on the more informative but smaller-scale patterns in the other 28 features. For the Logistic Regression pipeline, features were scaled with `StandardScaler` **before** SMOTE was applied, for exactly this reason.
 
 ## 3. Two Models, Two Different Requirements
 
@@ -41,16 +41,12 @@ Both models were trained on SMOTE-balanced training data, then evaluated on the 
 | ROC-AUC | 0.9708 | 0.9745 |
 
 **Confusion matrix, Logistic Regression:**
-```
 [[55397  1467]
  [    8    90]]
-```
 
 **Confusion matrix, Random Forest:**
-```
 [[56814    50]
  [   14    84]]
-```
 
 ## 5. Decision: Random Forest
 
@@ -66,9 +62,11 @@ Python, Pandas, Scikit-learn, imbalanced-learn (SMOTE)
 
 ## Files
 
-- `project2_fraud_detection.py` — full pipeline: load, split, scale, SMOTE, train, evaluate, compare
+- project2_fraud_detection.py — full pipeline: load, split, scale, SMOTE, train, evaluate, compare
 - Dataset: [Credit Card Fraud Detection](https://www.kaggle.com/mlg-ulb/creditcardfraud), 284,807 transactions
 
 ## Key Takeaway
 
 The hardest part of this project wasn't the algorithms, it was resisting the two traps built into the data itself: accuracy that lies by default, and a resampling step that silently breaks if scaling happens in the wrong order. Getting the pipeline right mattered more than which model got picked.
+
+LINKR FROM MY LINKEDIN POST ON TASK 2 - https://lnkd.in/p/eTmNpqXq
